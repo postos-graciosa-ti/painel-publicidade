@@ -4,26 +4,15 @@ const COOKIE_NAME = 'authenticated'
 
 export function middleware(request) {
   const token = request.cookies.get(COOKIE_NAME)?.value
+  const pathname = request.nextUrl.pathname
 
-  const publicPaths = [
-    '/',
-  ]
+  const publicPaths = ['/', '/login']
 
-  const currentPath = request.nextUrl.pathname
-
-  if (publicPaths.includes(currentPath)) {
+  if (publicPaths.includes(pathname)) {
     return NextResponse.next()
   }
 
-  const isPublicSubRoute = publicPaths.some(path =>
-    currentPath.startsWith(path + '/')
-  )
-
-  if (isPublicSubRoute) {
-    return NextResponse.next()
-  }
-
-  if (!token || token !== 'true') {
+  if (token !== 'true') {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 

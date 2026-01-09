@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 
 const APP_PASSWORD = process.env.APP_PASSWORD
-
 const COOKIE_NAME = 'authenticated'
 
 export async function POST(request) {
@@ -24,13 +23,13 @@ export async function POST(request) {
       name: COOKIE_NAME,
       value: 'true',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,       // 🔥 sempre true no Vercel
+      sameSite: 'lax',    // 🔥 evita bloqueio
       maxAge: 60 * 60 * 24,
       path: '/',
     })
 
     return response
-
   } catch (error) {
     return NextResponse.json(
       { error: 'Erro no servidor' },
