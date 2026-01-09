@@ -1,17 +1,40 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from 'next/server'
 
-export async function POST(req) {
-  const { password } = await req.json()
+const APP_PASSWORD = process.env.APP_PASSWORD
 
-  if (password !== "123456") {
+const COOKIE_NAME = 'authenticated'
+
+export async function POST(request) {
+  try {
+    const { password } = await request.json()
+
+    if (password !== APP_PASSWORD) {
+      return NextResponse.json(
+        { error: 'Senha incorreta' },
+        { status: 401 }
+      )
+    }
+
+    const response = NextResponse.json(
+      { success: true },
+      { status: 200 }
+    )
+
+    response.cookies.set({
+      name: COOKIE_NAME,
+      value: 'true',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24,
+      path: '/',
+    })
+
+    return response
+
+  } catch (error) {
     return NextResponse.json(
-      { message: "Senha incorreta" },
-      { status: 401 }
+      { error: 'Erro no servidor' },
+      { status: 500 }
     )
   }
-
-  return NextResponse.json(
-    { message: "Login realizado com sucesso" },
-    { status: 200 }
-  )
 }
