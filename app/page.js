@@ -11,7 +11,9 @@ import Swal from "sweetalert2"
 
 export default function Home() {
   const router = useRouter()
+
   const [password, setPassword] = useState("")
+
   const [loading, setLoading] = useState(false)
 
   const onSubmit = async () => {
@@ -21,15 +23,17 @@ export default function Home() {
         text: "Digite a senha",
         icon: "warning",
       })
+
       return
     }
 
     try {
       setLoading(true)
+
       console.log('Enviando login...')
 
-      const response = await axios.post("/api/login", { 
-        password: password.trim() 
+      const response = await axios.post("/api/login", {
+        password: password.trim()
       })
 
       console.log('Resposta do login:', response.data)
@@ -47,19 +51,19 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Erro completo:', error)
-      
+
       let message = "Erro inesperado ao realizar login"
-      
+
       if (error.response) {
-        // Erro do servidor
         message = error.response.data?.message || message
+
         console.log('Status:', error.response.status)
+
         console.log('Resposta:', error.response.data)
       } else if (error.request) {
-        // Sem resposta do servidor
         message = "Servidor não respondeu. Verifique sua conexão."
       }
-      
+
       Swal.fire({
         title: "Erro",
         text: message,
@@ -71,7 +75,6 @@ export default function Home() {
     }
   }
 
-  // Adiciona submit com Enter
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !loading) {
       onSubmit()
@@ -86,6 +89,7 @@ export default function Home() {
             <h4 className="text-2xl font-bold text-gray-800 mb-2">
               Painel Publicidade | Postos Graciosa
             </h4>
+
             <span className="text-gray-600">
               Painel de controle para gerenciamento de publicidade
             </span>
@@ -96,6 +100,7 @@ export default function Home() {
               <Label htmlFor="password" className="block text-gray-700 mb-2">
                 Senha de acesso
               </Label>
+
               <Input
                 id="password"
                 name="password"
@@ -112,7 +117,7 @@ export default function Home() {
 
             <Button
               type="button"
-              className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium"
+              className="w-full py-2 rounded-md text-white font-medium"
               onClick={onSubmit}
               disabled={loading}
             >
@@ -125,13 +130,6 @@ export default function Home() {
                 "Entrar"
               )}
             </Button>
-
-            {/* Dica para teste */}
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-              <p className="font-medium">Para teste rápido:</p>
-              <p>Senha atual: <code className="bg-yellow-100 px-1 rounded">admin123</code></p>
-              <p className="text-xs mt-1">(Edite em app/api/login/route.js)</p>
-            </div>
           </div>
         </div>
       </div>
