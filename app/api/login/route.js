@@ -1,38 +1,60 @@
 import { NextResponse } from 'next/server'
 
-const APP_PASSWORD = process.env.APP_PASSWORD
-const COOKIE_NAME = 'authenticated'
+const CORRECT_PASSWORD = process.env.APP_PASSWORD
+
+const JWT_SECRET = process.env.JWT_SECRET
 
 export async function POST(request) {
   try {
-    const { password } = await request.json()
+    const data = await request.json()
+    
+    const { password } = data
 
-    if (password !== APP_PASSWORD) {
+    console.log('Tentativa de login com senha:', password)
+
+    if (!password) {
       return NextResponse.json(
-        { error: 'Senha incorreta' },
+        { message: 'Digite a senha' },
+        { status: 400 }
+      )
+    }
+
+    if (password !== CORRECT_PASSWORD) {
+      console.log('Senha incorreta. Esperada:', CORRECT_PASSWORD, 'Recebida:', password)
+    
+      return NextResponse.json(
+        { message: 'Senha incorreta. Tente novamente.' },
         { status: 401 }
       )
     }
 
+    console.log('Login bem-sucedido!')
+
     const response = NextResponse.json(
-      { success: true },
+      { 
+        success: true,
+        message: 'Login realizado com sucesso!'
+      },
       { status: 200 }
     )
 
     response.cookies.set({
-      name: COOKIE_NAME,
-      value: 'true',
+      name: 'session_token',
+      value: 'authenticated',
       httpOnly: true,
-      secure: true,       // 🔥 sempre true no Vercel
-      sameSite: 'lax',    // 🔥 evita bloqueio
-      maxAge: 60 * 60 * 24,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 8,
       path: '/',
     })
 
     return response
+
   } catch (error) {
+    console.error('ERRO no login:', error)
+
     return NextResponse.json(
-      { error: 'Erro no servidor' },
+      { message: 'Erro no servidor. Tente novamente.' },
       { status: 500 }
     )
   }
