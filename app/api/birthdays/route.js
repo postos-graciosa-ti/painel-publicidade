@@ -1,5 +1,5 @@
+import { query } from "@/app/lib/db"
 import { NextResponse } from "next/server"
-import { query } from "../../lib/db"
 
 export async function GET(req) {
   try {
@@ -23,6 +23,7 @@ export async function GET(req) {
       INNER JOIN subsidiaries s
         ON s.id = e.subsidiarie_id
       WHERE EXTRACT(MONTH FROM e.datebirth) = $1
+        AND e.employee_status_id IN (1, 3)
       ORDER BY EXTRACT(DAY FROM e.datebirth)
       `,
       [month]
