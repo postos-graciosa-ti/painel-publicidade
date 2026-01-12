@@ -1,24 +1,41 @@
 import { NextResponse } from 'next/server'
 
-const COOKIE_NAME = 'authenticated'
-
 export function middleware(request) {
-  const token = request.cookies.get(COOKIE_NAME)?.value
-  const pathname = request.nextUrl.pathname
+  const { pathname } = request.nextUrl
 
-  const publicPaths = ['/', '/login']
+  console.log('Middleware executando para:', pathname)
 
-  if (publicPaths.includes(pathname)) {
+  const publicRoutes = ['/', '/api/login', '/api/sendEmails']
+
+  if (publicRoutes.includes(pathname)) {
+    console.log('Rota pública, permitindo acesso')
+
     return NextResponse.next()
   }
 
-  if (token !== 'true') {
-    return NextResponse.redirect(new URL('/login', request.url))
+  if (pathname.includes('_next') || pathname.includes('favicon.ico')) {
+    return NextResponse.next()
   }
 
-  return NextResponse.next()
+  const sessionToken = request.cookies.get('session_token')?.value
+
+  console.log('Cookie encontrado:', sessionToken)
+
+  if (sessionToken === 'authenticated') {
+    console.log('Usuário autenticado, permitindo acesso')
+
+    return NextResponse.next()
+  }
+
+  console.log('Não autenticado, redirecionando...')
+
+  const loginUrl = new URL('/', request.url)
+
+  return NextResponse.redirect(loginUrl)
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/((?!api/login|_next|favicon.ico).*)',
+  ],
 }
