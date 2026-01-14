@@ -32,6 +32,13 @@ export function Header() {
           >
             Aniversariantes
           </Link>
+          
+          <Link
+            href="/house-time"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Tempo de casa
+          </Link>
 
           <Button variant="outline" size="sm" asChild>
             <Link href="/">
